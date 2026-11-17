@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://islamiclibrary.anjalventures.com/schemas/quran_ayahs.schema.json",
+  "title": "Quran Ayah Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "ayah_global_number",
+    "surah_number",
+    "ayah_number_in_surah",
+    "text_arabic_uthmani",
+    "text_english_sahih"
+  ],
+  "properties": {
+    "id": { "type": "integer", "minimum": 1 },
+    "ayah_global_number": { "type": "integer", "minimum": 1, "maximum": 6236 },
+    "surah_number": { "type": "integer", "minimum": 1, "maximum": 114 },
+    "ayah_number_in_surah": { "type": "integer", "minimum": 1 },
+    "juz": { "type": ["integer", "null"], "minimum": 1, "maximum": 30 },
+    "manzil": { "type": ["integer", "null"], "minimum": 1, "maximum": 7 },
+    "page": { "type": ["integer", "null"], "minimum": 1 },
+    "ruku": { "type": ["integer", "null"], "minimum": 1 },
+    "hizb_quarter": { "type": ["integer", "null"], "minimum": 1 },
+    "sajda": { "type": ["string", "null"] },
+    "text_arabic_uthmani": { "type": "string", "minLength": 1 },
+    "text_english_sahih": { "type": "string", "minLength": 1 }
+  }
+}

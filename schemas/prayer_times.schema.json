@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://islamiclibrary.anjalventures.com/schemas/prayer_times.schema.json",
+  "title": "Prayer Times Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "date_gregorian",
+    "date_hijri",
+    "country",
+    "city",
+    "fajr",
+    "dhuhr",
+    "asr",
+    "maghrib",
+    "isha"
+  ],
+  "properties": {
+    "id": { "type": "integer", "minimum": 1 },
+    "date_gregorian": { "type": "string", "minLength": 1 },
+    "date_hijri": { "type": "string", "minLength": 1 },
+    "country": { "type": "string", "minLength": 1 },
+    "city": { "type": "string", "minLength": 1 },
+    "timezone": { "type": ["string", "null"] },
+    "method": { "type": ["string", "null"] },
+    "fajr": { "type": ["string", "null"] },
+    "sunrise": { "type": ["string", "null"] },
+    "dhuhr": { "type": ["string", "null"] },
+    "asr": { "type": ["string", "null"] },
+    "maghrib": { "type": ["string", "null"] },
+    "isha": { "type": ["string", "null"] }
+  }
+}

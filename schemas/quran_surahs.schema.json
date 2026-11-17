@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://islamiclibrary.anjalventures.com/schemas/quran_surahs.schema.json",
+  "title": "Quran Surah Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "surah_number",
+    "name_arabic",
+    "name_english",
+    "name_english_translation",
+    "revelation_type",
+    "ayah_count"
+  ],
+  "properties": {
+    "surah_number": { "type": "integer", "minimum": 1, "maximum": 114 },
+    "name_arabic": { "type": "string", "minLength": 1 },
+    "name_english": { "type": "string", "minLength": 1 },
+    "name_english_translation": { "type": "string", "minLength": 1 },
+    "revelation_type": { "type": "string", "enum": ["Meccan", "Medinan"] },
+    "ayah_count": { "type": "integer", "minimum": 1 }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://islamiclibrary.anjalventures.com/schemas/hadith_entries.schema.json",
+  "title": "Hadith Entry Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "collection_key",
+    "collection_name",
+    "hadith_number",
+    "text_arabic",
+    "text_english"
+  ],
+  "properties": {
+    "id": { "type": "integer", "minimum": 1 },
+    "collection_key": { "type": "string", "minLength": 1 },
+    "collection_name": { "type": "string", "minLength": 1 },
+    "hadith_number": { "type": "integer", "minimum": 0 },
+    "arabic_number": { "type": ["string", "null"] },
+    "book_number": { "type": ["string", "null"] },
+    "hadith_ref_number": { "type": ["string", "null"] },
+    "text_arabic": { "type": "string" },
+    "text_english": { "type": "string" },
+    "grades": {
+      "type": ["array", "string", "null"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "grade": { "type": "string" }
+        }
+      }
+    }
+  }
+}

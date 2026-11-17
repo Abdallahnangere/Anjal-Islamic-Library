@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  validate-datasets-and-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -r requirements-dev.txt
+
+      - name: Verify encoding and manifest integrity
+        run: |
+          python scripts/export_json.py --verify
+          python scripts/verify_text_encoding.py
+
+      - name: Run API and dataset pipeline tests
+        run: python -m unittest discover -s tests -v

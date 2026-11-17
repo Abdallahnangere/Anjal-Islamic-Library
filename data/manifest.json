@@ -1,0 +1,61 @@
+{
+  "dataset_name": "Anjal Islamic Library",
+  "dataset_version": "2.0.0",
+  "license": "MIT",
+  "api_version": "v1",
+  "sqlite_snapshot": {
+    "path": "data/index/library.db.gz",
+    "sha256": "d51f89f52fc104957f4789b4136a7cd29af2ea85d03d833ea69ff665f002a282",
+    "size_bytes": 33514590
+  },
+  "datasets": {
+    "quran_surahs": {
+      "table": "quran_surahs",
+      "source_csv": "data/source/surahs_ar_en.csv",
+      "source_sha256": "7b5b6402bbc99e69363b5aafcee3283e91de40047f90ed6d9089ff23094c0cad",
+      "schema": "schemas/quran_surahs.schema.json",
+      "row_count": 114,
+      "primary_key": "surah_number"
+    },
+    "quran_ayahs": {
+      "table": "quran_ayahs",
+      "source_csv": "data/source/ayahs_ar_en.csv",
+      "source_sha256": "2c0187cb342b9a456ae9e0e86f7e369db4d064032f31b24e9f942ee842225e00",
+      "schema": "schemas/quran_ayahs.schema.json",
+      "row_count": 6236,
+      "primary_key": "ayah_global_number"
+    },
+    "hadith_collections": {
+      "table": "hadith_collections",
+      "source_csv": "data/source/collections_summary.csv",
+      "source_sha256": "8d6d1b3014204018886e19b8aa3f7b98b8e44fcc70568b9531fc1f32276b53e1",
+      "schema": "schemas/hadith_collections.schema.json",
+      "row_count": 10,
+      "primary_key": "collection_key"
+    },
+    "hadith_entries": {
+      "table": "hadith_entries",
+      "source_csv": "data/source/hadith_all_collections_ar_en.csv",
+      "source_sha256": "cd0c02dcd8871685a111ae98190436f82fbedf10cdbf9721e1fac7f5ca11b658",
+      "schema": "schemas/hadith_entries.schema.json",
+      "row_count": 36512,
+      "primary_key": "id"
+    },
+    "hijri_dates": {
+      "table": "hijri_dates",
+      "source_csv": "data/source/ummalqura_1343_1500.csv",
+      "source_sha256": "ea5af2ab8c5043f0f0307810258d5222713894211e0c05a560dc6ce5893575ab",
+      "schema": "schemas/hijri_dates.schema.json",
+      "row_count": 55991,
+      "primary_key": "rjd"
+    },
+    "prayer_times": {
+      "table": "prayer_times",
+      "source_csv": "data/source/prayer_times_selected_plus_all_nigeria.csv",
+      "source_sha256": "5d844ab2b1f14807352cf076eb0388215ea62aadcf7b5a0ff9571c0589e9eb43",
+      "schema": "schemas/prayer_times.schema.json",
+      "row_count": 836,
+      "primary_key": "id"
+    }
+  }
+}

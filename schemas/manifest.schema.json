@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://islamiclibrary.anjalventures.com/schemas/manifest.schema.json",
+  "title": "Anjal Islamic Library Dataset Manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "dataset_name",
+    "dataset_version",
+    "license",
+    "api_version",
+    "sqlite_snapshot",
+    "datasets"
+  ],
+  "properties": {
+    "dataset_name": { "type": "string" },
+    "dataset_version": { "type": "string" },
+    "license": { "type": "string" },
+    "api_version": { "type": "string" },
+    "sqlite_snapshot": {
+      "type": "object",
+      "required": ["path", "sha256", "size_bytes"],
+      "properties": {
+        "path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "size_bytes": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "datasets": {
+      "type": "object",
+      "minProperties": 6,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["table", "source_csv", "source_sha256", "schema", "row_count", "primary_key"],
+        "properties": {
+          "table": { "type": "string" },
+          "source_csv": { "type": "string" },
+          "source_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "schema": { "type": "string" },
+          "row_count": { "type": "integer", "minimum": 1 },
+          "primary_key": { "type": "string" }
+        }
+      }
+    }
+  }
+}

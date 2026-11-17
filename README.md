@@ -1,358 +1,109 @@
-# Anjal Islamic Library API
+# Anjal Islamic Library — Structured Dataset & Data API
 
-Versioned Islamic data API repository for year-round app usage and public developer access.
+[![CI](https://github.com/Abdallahnangere/Anjal-Islamic-Library/actions/workflows/ci.yml/badge.svg)](https://github.com/Abdallahnangere/Anjal-Islamic-Library/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)](https://www.python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-OpenAPI_3-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 
-Maintainer: **Abdallah Nangere**  
-Contact: **founder@ramadanbot.app** | **+2348164135836**
+Headless, versioned Islamic reference datasets and FastAPI JSON data service covering **Quran**, **Hadith**, **Umm al-Qura Hijri calendar**, and **Prayer Times** (including all Nigerian LGAs/cities and selected international cities).
 
-GitHub: `https://github.com/Abdallahnangere/Anjal-Islami-Library`
+- **GitHub:** `https://github.com/Abdallahnangere/Anjal-Islamic-Library`
+- **Production API:** `https://islamiclibrary.anjalventures.com` *(HTTPS-only)*
+- **Interactive OpenAPI Docs:** `/docs` · **ReDoc:** `/redoc` · **OpenAPI JSON:** `/openapi.json`
+- **Maintainer:** Abdallah Nangere (`founder@ramadanbot.app`)
 
-## Included Datasets
+---
 
-- Umm al-Qura Hijri dates (`1343-01-01 AH` to `1500-12-30 AH`)
-- Quran (`quran-uthmani` Arabic + `en.sahih` English)
-- Hadith (Arabic+English merged collections)
-- Prayer times (all Nigeria entries + selected global countries/cities)
+## Included Structured Datasets
 
-## API Version
+| Dataset Key | Source CSV | JSON Schema | Records |
+| --- | --- | --- | ---: |
+| `quran_surahs` | [`data/source/surahs_ar_en.csv`](./data/source/surahs_ar_en.csv) | [`schemas/quran_surahs.schema.json`](./schemas/quran_surahs.schema.json) | 114 |
+| `quran_ayahs` | [`data/source/ayahs_ar_en.csv`](./data/source/ayahs_ar_en.csv) | [`schemas/quran_ayahs.schema.json`](./schemas/quran_ayahs.schema.json) | 6,236 |
+| `hadith_collections` | [`data/source/collections_summary.csv`](./data/source/collections_summary.csv) | [`schemas/hadith_collections.schema.json`](./schemas/hadith_collections.schema.json) | 10 |
+| `hadith_entries` | [`data/source/hadith_all_collections_ar_en.csv`](./data/source/hadith_all_collections_ar_en.csv) | [`schemas/hadith_entries.schema.json`](./schemas/hadith_entries.schema.json) | 36,512 |
+| `hijri_dates` | [`data/source/ummalqura_1343_1500.csv`](./data/source/ummalqura_1343_1500.csv) | [`schemas/hijri_dates.schema.json`](./schemas/hijri_dates.schema.json) | 55,991 |
+| `prayer_times` | [`data/source/prayer_times_selected_plus_all_nigeria.csv`](./data/source/prayer_times_selected_plus_all_nigeria.csv) | [`schemas/prayer_times.schema.json`](./schemas/prayer_times.schema.json) | 836 |
 
-- Current: `v1`
-- Base URL (local): `http://127.0.0.1:8000`
-- Production URL: `https://islamiclibrary.anjalventures.com`
-- Note: Production is **HTTPS-only**. `http://` requests return `308 Permanent Redirect`.
+- Dataset checksums, counts, and SQLite snapshot hashes are tracked in [`data/manifest.json`](./data/manifest.json) (validated against [`schemas/manifest.schema.json`](./schemas/manifest.schema.json)).
+- Pre-built compressed SQLite FTS5 snapshot: [`data/index/library.db.gz`](./data/index/library.db.gz).
 
-## Quick Start
+---
+
+## Dataset Pipeline & Local Setup
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
+.venv\Scripts\activate      # On macOS/Linux: source .venv/bin/activate
+pip install -r requirements-dev.txt
+
+# 1. Build SQLite FTS5 index from CSV sources
 python scripts/build_db.py
+
+# 2. Verify UTF-8 / Arabic normalization (zero mojibake)
+python scripts/verify_text_encoding.py
+
+# 3. Export normalized JSONL or JSON datasets (written to data/export/)
+python scripts/export_json.py --format jsonl
+
+# 4. Verify data/manifest.json & JSON Schemas match the database
+python scripts/export_json.py --verify
+
+# 5. Run the automated test suite
+pytest -v
+
+# 6. Start the headless JSON API locally
 uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
 
-Swagger docs:
-- `http://127.0.0.1:8000/docs`
-- `http://127.0.0.1:8000/developers` (full developer guide)
+---
 
-## Public Usage
-
-- Live API root: `https://islamiclibrary.anjalventures.com`
-- Docs: `https://islamiclibrary.anjalventures.com/docs`
-- Developer Guide: `https://islamiclibrary.anjalventures.com/developers`
-- Health: `https://islamiclibrary.anjalventures.com/v1/health`
-
-## Windows PowerShell UTF-8 Note
-
-If Arabic text appears garbled in PowerShell, set UTF-8 before requests:
-
-```powershell
-chcp 65001
-[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
-$OutputEncoding = [System.Text.UTF8Encoding]::new()
-```
-
-Then call:
-
-```powershell
-$hadith = Invoke-RestMethod -Uri "https://islamiclibrary.anjalventures.com/v1/hadith/nawawi/30"
-$hadith.data.text_arabic
-$hadith.data.text_english
-```
-
-## v1.1 Highlights
-
-`v1.1` introduces operational capabilities for production integrations:
-- API key authentication support for protected usage tiers.
-- Rate-limiting controls and related response signaling.
-- Pagination parameters for list/search-heavy responses.
-- Expanded filter options for better query precision.
-- Documentation and SDK-style usage examples for Python and JavaScript clients.
-
-## Vercel (Current Phase)
-
-This repo is configured for Vercel Python runtime via:
-- `api/index.py`
-- `vercel.json`
-
-On Vercel, the API writes `library.db` to `/tmp/anjal/library.db` on cold start if not already present.
-
-## Endpoints (With Samples)
-
-### Meta
-
-Request:
-```http
-GET /v1/health
-```
-Response:
-```json
-{"ok": true, "service": "Anjal Islamic Library API", "version": "v1"}
-```
-
-Request:
-```http
-GET /v1/meta
-```
-Response (sample):
-```json
-{
-  "service": "Anjal Islamic Library API",
-  "version": "v1",
-  "counts": {
-    "quran_ayahs": 6236,
-    "hadith_entries": 36512,
-    "hijri_dates": 55991,
-    "prayer_times": 836
-  },
-  "metadata": {
-    "project_name": "Anjal Islamic Library API",
-    "author": "Abdallah Nangere"
-  }
-}
-```
-
-### Quran
-
-Request:
-```http
-GET /v1/quran/ayah/1/1
-```
-Response (sample):
-```json
-{
-  "found": true,
-  "data": {
-    "surah_number": 1,
-    "ayah_number_in_surah": 1,
-    "text_english_sahih": "In the name of Allah, the Entirely Merciful, the Especially Merciful."
-  }
-}
-```
-
-Request:
-```http
-GET /v1/quran/search?q=mercy&limit=10
-```
-Response (shape):
-```json
-{
-  "query": "mercy",
-  "count": 10,
-  "results": [{ "surah_number": 1, "ayah_number_in_surah": 1 }]
-}
-```
-
-### Hadith
-
-Request:
-```http
-GET /v1/hadith/bukhari/15
-```
-Response (sample):
-```json
-{
-  "found": true,
-  "data": {
-    "collection_key": "bukhari",
-    "hadith_number": 15,
-    "book_number": "2",
-    "hadith_ref_number": "8"
-  }
-}
-```
-
-Request:
-```http
-GET /v1/hadith/search?q=prayer&collection=bukhari&limit=10
-```
-Response (shape):
-```json
-{
-  "query": "prayer",
-  "collection": "bukhari",
-  "count": 10,
-  "results": [{ "collection_key": "bukhari", "hadith_number": 8 }]
-}
-```
-
-### Hijri
-
-Request:
-```http
-GET /v1/hijri/to-gregorian?year=1447&month=11&day=12
-```
-Response:
-```json
-{"found": true, "gregorian_iso": "2026-04-29"}
-```
-
-Request:
-```http
-GET /v1/hijri/from-gregorian?date=2026-04-29
-```
-Response:
-```json
-{"found": true, "hijri_iso": "1447-11-12"}
-```
-
-### Prayer
-
-Request:
-```http
-GET /v1/prayer/countries
-```
-Response (shape):
-```json
-{
-  "count": 22,
-  "countries": ["Nigeria", "Saudi Arabia", "United States"]
-}
-```
-
-Request:
-```http
-GET /v1/prayer/cities?country=Nigeria
-```
-Response (shape):
-```json
-{
-  "country": "Nigeria",
-  "count": 768,
-  "cities": ["Aba North", "Aba South", "Abadam"]
-}
-```
-
-Request:
-```http
-GET /v1/prayer/times?country=Nigeria&city=Lagos%20Island
-```
-Response (sample):
-```json
-{
-  "found": true,
-  "data": {
-    "country": "Nigeria",
-    "city": "Lagos Island",
-    "date_gregorian": "29-04-2026",
-    "fajr": "05:34",
-    "dhuhr": "12:44",
-    "asr": "16:01",
-    "maghrib": "18:54",
-    "isha": "19:53"
-  }
-}
-```
-
-Request:
-```http
-GET /v1/prayer/search-city?q=Lagos
-```
-Response (sample):
-```json
-{
-  "query": "Lagos",
-  "count": 2,
-  "results": [
-    { "country": "Nigeria", "city": "Lagos Island" },
-    { "country": "Nigeria", "city": "Lagos Mainland" }
-  ]
-}
-```
-
-## Repository Structure
+## Repository Layout
 
 ```text
+api/                        # Vercel ASGI entrypoint
 app/
-  main.py
-  db.py
-  routers/
-scripts/
-  build_db.py
+  main.py                   # Headless FastAPI service, auth/rate-limit middleware, /docs & /openapi.json
+  bootstrap.py              # Hydrates library.db from library.db.gz snapshot
+  db.py                     # SQLite connection helper
+  i18n.py                   # English / Arabic response localization
+  routers/                  # /v1/meta, /v1/quran, /v1/hadith, /v1/hijri, /v1/prayer
 data/
-  source/     # source CSV datasets
-  index/      # generated SQLite index (library.db)
+  source/                   # Canonical UTF-8 CSV datasets
+  index/                    # Compressed SQLite FTS5 snapshot (library.db.gz)
+  manifest.json             # SHA-256 checksums, record counts & schema registry
+schemas/                    # JSON Schema (Draft 2020-12) definitions
+scripts/
+  build_db.py               # Normalizes CSVs (BOM/NFC/mojibake) & builds SQLite FTS5 DB
+  export_json.py            # Exports typed JSON/JSONL & verifies manifest/schemas
+  verify_text_encoding.py   # Scans SQLite text columns for encoding corruption
+tests/                      # Pytest suite for FastAPI endpoints & dataset pipeline
+examples/                   # Python & JavaScript client wrappers
 ```
 
-## Client Examples
+---
 
-### cURL
+## API Endpoints (`v1`)
 
-```bash
-curl "https://islamiclibrary.anjalventures.com/v1/quran/ayah/1/1"
-curl "https://islamiclibrary.anjalventures.com/v1/hadith/bukhari/15"
-curl "https://islamiclibrary.anjalventures.com/v1/hijri/from-gregorian?date=2026-04-29"
-```
+| Group | Endpoints |
+| --- | --- |
+| **Service** | `GET /`, `GET /v1/health`, `GET /v1/meta`, `GET /docs`, `GET /redoc`, `GET /openapi.json` |
+| **Quran** | `GET /v1/quran/surahs`, `GET /v1/quran/ayah/{surah}/{ayah}`, `GET /v1/quran/search?q=...` |
+| **Hadith** | `GET /v1/hadith/collections`, `GET /v1/hadith/{collection}/{hadith_number}`, `GET /v1/hadith/search?q=...` |
+| **Hijri** | `GET /v1/hijri/to-gregorian?year=...&month=...&day=...`, `GET /v1/hijri/from-gregorian?date=YYYY-MM-DD` |
+| **Prayer** | `GET /v1/prayer/countries`, `GET /v1/prayer/cities?country=...`, `GET /v1/prayer/times?country=...&city=...`, `GET /v1/prayer/search-city?q=...` |
 
-### API Key Usage
+Optional environment controls:
+- `ANJAL_API_KEYS`: comma-separated keys enforced via `X-API-Key` or `Authorization: Bearer <key>` on `/v1/*` when set.
+- `ANJAL_RATE_LIMIT_WINDOW_SEC` / `ANJAL_RATE_LIMIT_MAX_REQUESTS`: sliding-window rate limit controls.
+- `ANJAL_DB_PATH` / `ANJAL_DISABLE_RUNTIME_DB_BUILD`: runtime SQLite path and cold-start guard (used by Vercel in `api/index.py`).
 
-#### cURL
+### Client Examples
+- Python: [`examples/python_client.py`](./examples/python_client.py)
+- JavaScript: [`examples/js_client.mjs`](./examples/js_client.mjs)
 
-```bash
-curl -H "X-API-Key: YOUR_API_KEY" \
-  "https://islamiclibrary.anjalventures.com/v1/quran/search?q=mercy&limit=5"
-```
+---
 
-#### JavaScript (fetch)
+## License
 
-```javascript
-const res = await fetch("https://islamiclibrary.anjalventures.com/v1/meta", {
-  headers: { "X-API-Key": "YOUR_API_KEY" }
-});
-const data = await res.json();
-console.log(data);
-```
-
-#### Python (requests)
-
-```python
-import requests
-
-r = requests.get(
-    "https://islamiclibrary.anjalventures.com/v1/meta",
-    headers={"X-API-Key": "YOUR_API_KEY"},
-    timeout=20,
-)
-print(r.json())
-```
-
-### JavaScript (fetch)
-
-```javascript
-const res = await fetch("https://islamiclibrary.anjalventures.com/v1/prayer/search-city?q=Abuja");
-const data = await res.json();
-console.log(data);
-```
-
-### Python
-
-```python
-import requests
-r = requests.get("https://islamiclibrary.anjalventures.com/v1/quran/search", params={"q": "mercy", "limit": 5}, timeout=20)
-print(r.json())
-```
-
-### SDK-Style Local Examples
-
-- Python wrapper + runnable examples: `examples/python_client.py`
-- JavaScript wrapper + runnable examples: `examples/js_client.mjs`
-
-## Versioning Policy
-
-- Stable path for current contract: `/v1`
-- Breaking changes go to a new major path (e.g. `/v2`)
-- Backward-compatible enhancements can be added within current version
-
-## Governance
-
-- License: [LICENSE](./LICENSE)
-- Contribution guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
-- Release history: [CHANGELOG.md](./CHANGELOG.md)
-
-## Notes
-
-- Full-text search is indexed using SQLite FTS5 for Quran and Hadith.
-- Rebuild the index whenever source datasets are updated:
-  - `python scripts/build_db.py`
-- Route note: keep `/v1/hadith/search` defined before `/v1/hadith/{collection}/{hadith_number}`.
-- SQLite note: one connection is opened per request and closed immediately; this is acceptable for current scope.
+Released under the [MIT License](./LICENSE).
